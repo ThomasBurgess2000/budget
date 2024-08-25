@@ -1,6 +1,6 @@
 # Budget
 
-!(budget screenshot)[https://i.imgur.com/5aU6WBE.png]
+![budget screenshot](https://i.imgur.com/5aU6WBE.png)
 
 Budget is a personal finance app built with [Refine](https://github.com/refinedev/refine) and [Supabase](https://supabase.com/).
 
