@@ -49,13 +49,9 @@ export default function TransactionsList() {
         />
         <Table.Column
           dataIndex="created_at"
-          title="Created At"
-          render={(value) => <DateField value={value} format="YYYY-MM-DD HH:mm:ss" />}
-        />
-        <Table.Column
-          dataIndex="updated_at"
-          title="Updated At"
-          render={(value) => <DateField value={value} format="YYYY-MM-DD HH:mm:ss" />}
+          title="Date"
+          render={(value) => <DateField value={value} format="M/DD/YY" />}
+          ellipsis={true}
         />
         <Table.Column
           title={"Actions"}

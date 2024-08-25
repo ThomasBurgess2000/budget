@@ -1,6 +1,5 @@
-import { DevtoolsProvider } from "@providers/devtools";
 import { useNotificationProvider } from "@refinedev/antd";
-import { GitHubBanner, Refine } from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import routerProvider from "@refinedev/nextjs-router";
 import { Metadata } from "next";
@@ -45,6 +44,16 @@ export default function RootLayout({
                     notificationProvider={useNotificationProvider}
                     resources={[
                       {
+                        name: "Current Budget",
+                        list: "/current-budget",
+                        meta: {
+                          label: "Current Budget",
+                        },
+                      },
+                      {
+                        name: "Detailed Views",
+                      },
+                      {
                         name: "Transactions",
                         list: "/transactions",
                         create: "/transactions/create",
@@ -52,6 +61,7 @@ export default function RootLayout({
                         show: "/transactions/show/:id",
                         meta: {
                           canDelete: true,
+                          parent: "Detailed Views",
                         },
                       },
                       {
@@ -61,9 +71,22 @@ export default function RootLayout({
                         edit: "/categories/edit/:id",
                         show: "/categories/show/:id",
                         meta: {
-                          canDelete: true
+                          canDelete: true,
+                          parent: "Detailed Views",
                         },
-                      }
+                      },
+                      {
+                        name: "MonthlyBudgets",
+                        list: "/monthly-budgets",
+                        create: "/monthly-budgets/create",
+                        edit: "/monthly-budgets/edit/:id",
+                        show: "/monthly-budgets/show/:id",
+                        meta: {
+                          canDelete: true,
+                          label: "Monthly Budgets",
+                          parent: "Detailed Views",
+                        },
+                      },
                     ]}
                     options={{
                       syncWithLocation: true,

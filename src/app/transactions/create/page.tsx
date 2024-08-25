@@ -1,10 +1,18 @@
 "use client";
 
 import { Create, useForm, useSelect } from "@refinedev/antd";
+import { useNavigation } from "@refinedev/core";
 import { Form, Input, Select } from "antd";
 
 export default function TransactionsCreate() {
-  const { formProps, saveButtonProps } = useForm({});
+  const { goBack } = useNavigation();
+
+  const { formProps, saveButtonProps } = useForm({
+    redirect: "list",
+    onMutationSuccess: () => {
+      goBack();
+    },
+  });
 
   const { selectProps: categorySelectProps } = useSelect({
     resource: "Categories",
