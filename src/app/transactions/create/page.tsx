@@ -8,10 +8,17 @@ export default function TransactionsCreate() {
   const { goBack } = useNavigation();
 
   const { formProps, saveButtonProps } = useForm({
-    redirect: "list",
+    redirect: false,
     onMutationSuccess: () => {
       goBack();
     },
+    successNotification: () => {
+      return {
+        message: "Logged!",
+        description: undefined,
+        type: "success",
+      }
+    }
   });
 
   const { selectProps: categorySelectProps } = useSelect({

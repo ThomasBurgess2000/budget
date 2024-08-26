@@ -40,7 +40,7 @@ const drawerButtonStyles: CSSProperties = {
   borderTopLeftRadius: 0,
   borderBottomLeftRadius: 0,
   position: "fixed",
-  top: 16,
+  bottom: 20,
   zIndex: 999,
 };
 

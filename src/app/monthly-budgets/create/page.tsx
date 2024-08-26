@@ -18,9 +18,9 @@ export default function MonthlyBudgetsCreate() {
               required: true,
             },
           ]}
-          initialValue={dayjs().startOf('month').format("MMMM YYYY")}
+          initialValue={dayjs().startOf("month")}
         >
-          <DatePicker picker="month" format="YYYY-MM" />
+          <DatePicker picker="month" format="MMMM YYYY" />
         </Form.Item>
       </Form>
     </Create>
