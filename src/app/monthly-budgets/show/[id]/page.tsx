@@ -50,7 +50,7 @@ export default function MonthlyBudgetShow() {
 
   // Fetch previous month's budget
   const previousMonth = dayjs(record?.month).subtract(1, "month");
-  const { data: prevBudgetData, isLoading: prevBudgetIsLoading } = useList({
+  const { data: prevBudgetData } = useList({
     resource: "MonthlyBudgets",
     filters: [
       {
@@ -64,10 +64,10 @@ export default function MonthlyBudgetShow() {
     },
   });
 
-  const prevBudgetId = prevBudgetData?.data?.[0].id;
+  const prevBudgetId = prevBudgetData?.data?.[0]?.id;
 
   // Fetch previous month's categories
-  const { data: prevCategoriesData, isLoading: prevCategoriesIsLoading } =
+  const { data: prevCategoriesData } =
     useList({
       resource: "Categories",
       filters: [
@@ -83,7 +83,7 @@ export default function MonthlyBudgetShow() {
     });
 
   // Fetch previous month's transactions
-  const { data: prevTransactionsData, isLoading: prevTransactionsIsLoading } =
+  const { data: prevTransactionsData } =
     useList({
       resource: "Transactions",
       filters: [
