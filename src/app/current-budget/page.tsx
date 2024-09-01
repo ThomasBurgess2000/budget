@@ -18,20 +18,27 @@ export default function CurrentBudget() {
   });
 
   useEffect(() => {
-    if (!isLoading && data?.data?.length && data?.data?.length > 0) {
-      const currentMonthBudget = data.data[0];
-      if (!currentMonthBudget.id) {
-        return;
+    if (!isLoading) {
+      if (data?.data?.length && data.data[0].id) {
+        // Redirect to the current month's budget if it exists
+        go({
+          to: {
+            resource: "MonthlyBudgets",
+            action: "show",
+            id: data.data[0].id,
+          },
+        });
+      } else {
+        // Redirect to the monthly budget list page if the current month's budget doesn't exist
+        go({
+          to: {
+            resource: "MonthlyBudgets",
+            action: "list",
+          },
+        });
       }
-      go({
-        to: {
-          resource: "MonthlyBudgets",
-          action: "show",
-          id: currentMonthBudget.id,
-        },
-      });
     }
   }, [isLoading, data, go]);
 
-  return <div>Redirecting to the current month&apos;s budget...</div>;
+  return <div>Redirecting...</div>;
 }
