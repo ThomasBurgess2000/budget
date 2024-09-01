@@ -22,6 +22,7 @@ export default function MonthlyBudgetsCreate() {
 
   const { data: allCategories } = useList({
     resource: "Categories",
+    pagination: { mode: "off" },
   });
 
   const handleFormSubmit = async (values: any) => {

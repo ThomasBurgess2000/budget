@@ -62,41 +62,48 @@ export default function MonthlyBudgetShow() {
     queryOptions: {
       enabled: !!record,
     },
+    pagination: {
+      mode: "off",
+    },
   });
 
   const prevBudgetId = prevBudgetData?.data?.[0]?.id;
 
   // Fetch previous month's categories
-  const { data: prevCategoriesData } =
-    useList({
-      resource: "Categories",
-      filters: [
-        {
-          field: "monthly_budget",
-          operator: "eq",
-          value: prevBudgetId,
-        },
-      ],
-      queryOptions: {
-        enabled: !!prevBudgetId,
+  const { data: prevCategoriesData } = useList({
+    resource: "Categories",
+    filters: [
+      {
+        field: "monthly_budget",
+        operator: "eq",
+        value: prevBudgetId,
       },
-    });
+    ],
+    queryOptions: {
+      enabled: !!prevBudgetId,
+    },
+    pagination: {
+      mode: "off",
+    },
+  });
 
   // Fetch previous month's transactions
-  const { data: prevTransactionsData } =
-    useList({
-      resource: "Transactions",
-      filters: [
-        {
-          field: "category",
-          operator: "in",
-          value: prevCategoriesData?.data?.map((category) => category.id) || [],
-        },
-      ],
-      queryOptions: {
-        enabled: !!prevCategoriesData?.data,
+  const { data: prevTransactionsData } = useList({
+    resource: "Transactions",
+    filters: [
+      {
+        field: "category",
+        operator: "in",
+        value: prevCategoriesData?.data?.map((category) => category.id) || [],
       },
-    });
+    ],
+    queryOptions: {
+      enabled: !!prevCategoriesData?.data,
+    },
+    pagination: {
+      mode: "off",
+    },
+  });
 
   // Calculate rollover amounts for each category in the previous month
   const rolloverAmounts = useMemo(() => {
@@ -142,6 +149,9 @@ export default function MonthlyBudgetShow() {
           .format("YYYY-MM-DD"),
       },
     ],
+    pagination: {
+      mode: "off",
+    },
   });
 
   const { data: categoriesData, isLoading: categoriesIsLoading } = useList({
@@ -153,6 +163,9 @@ export default function MonthlyBudgetShow() {
         value: record?.id,
       },
     ],
+    pagination: {
+      mode: "off",
+    },
     queryOptions: {
       enabled: !!record,
     },
