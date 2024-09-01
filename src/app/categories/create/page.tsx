@@ -2,7 +2,7 @@
 
 import { Create, useForm } from "@refinedev/antd";
 import { useGo, useNotification } from "@refinedev/core";
-import { Form, Input, InputNumber } from "antd";
+import { Form, Input, InputNumber, Radio } from "antd";
 import { useSearchParams } from "next/navigation";
 
 export default function CategoryCreate() {
@@ -13,7 +13,7 @@ export default function CategoryCreate() {
   const { open } = useNotification();
 
   const { formProps, saveButtonProps } = useForm({
-    redirect: false, 
+    redirect: false,
     onMutationSuccess: () => {
       // After successful creation, navigate back to the monthly budget show page
       if (monthly_budget_id) {
@@ -34,7 +34,8 @@ export default function CategoryCreate() {
       open?.({
         type: "error",
         message: "Failed to create category",
-        description: "Please try again or contact support if the issue persists.",
+        description:
+          "Please try again or contact support if the issue persists.",
       });
     },
   });
@@ -45,7 +46,6 @@ export default function CategoryCreate() {
         {...formProps}
         layout="vertical"
         onFinish={(values) => {
-          console.log("Form values:", values); // Log form values before submission
           return formProps.onFinish?.({
             ...values,
             monthly_budget: monthly_budget_id,
@@ -54,6 +54,17 @@ export default function CategoryCreate() {
       >
         <Form.Item label="Title" name="title" rules={[{ required: true }]}>
           <Input />
+        </Form.Item>
+        <Form.Item
+          label="Type"
+          name="type"
+          rules={[{ required: true }]}
+          initialValue="Expense"
+        >
+          <Radio.Group>
+            <Radio value="expense">Expense</Radio>
+            <Radio value="income">Income</Radio>
+          </Radio.Group>
         </Form.Item>
         <Form.Item
           label="Amount Budgeted"

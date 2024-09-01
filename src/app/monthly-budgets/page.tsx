@@ -15,6 +15,8 @@ export default function MonthlyBudgetsList() {
     },
   });
 
+  const mostRecentBudget = tableProps?.dataSource?.[0];
+
   const go = useGo();
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
   const { mutate: deleteMutate } = useDelete();
@@ -141,7 +143,9 @@ export default function MonthlyBudgetsList() {
           sorter
         />
       </Table>
-      <LogPurchaseButton />
+      {mostRecentBudget?.id && (
+        <LogPurchaseButton monthly_budget_id={mostRecentBudget.id.toString()} />
+      )}
     </List>
   );
 }

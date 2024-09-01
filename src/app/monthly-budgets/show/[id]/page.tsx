@@ -17,6 +17,7 @@ import {
   Button,
   Modal,
   InputNumber,
+  theme,
 } from "antd";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
@@ -47,6 +48,7 @@ export default function MonthlyBudgetShow() {
   const { mutate: create } = useCreate();
   const { mutate: update } = useUpdate();
   const { mutate: deleteCategory } = useDelete();
+  const { token } = theme.useToken();
 
   // Fetch previous month's budget
   const previousMonth = dayjs(record?.month).subtract(1, "month");
@@ -171,10 +173,6 @@ export default function MonthlyBudgetShow() {
     },
   });
 
-  if (isLoading || transactionsIsLoading || categoriesIsLoading) {
-    return <div>Loading...</div>;
-  }
-
   const groupedTransactions = categoriesData?.data?.reduce((acc, category) => {
     const categoryTransactions =
       transactionsData?.data?.filter(
@@ -190,10 +188,32 @@ export default function MonthlyBudgetShow() {
       category: category,
       transactions: sortedTransactions,
       total: sortedTransactions.reduce((sum, t) => sum + t.amount, 0),
+      transactionCount: sortedTransactions.length,
     };
 
     return acc;
   }, {});
+
+  // Sort categories by transaction count in descending order
+  const sortedCategories = Object.values(groupedTransactions || {}).sort(
+    (a: any, b: any) => b.transactionCount - a.transactionCount
+  );
+
+  const budgetSummary = useMemo(() => {
+    if (!groupedTransactions) return { totalExpenses: 0, totalIncome: 0 };
+
+    return Object.values(groupedTransactions).reduce(
+      (acc, group: any) => {
+        if (group.category.type === "income") {
+          acc.totalIncome += group.category.amount_budgeted;
+        } else {
+          acc.totalExpenses += group.category.amount_budgeted;
+        }
+        return acc;
+      },
+      { totalExpenses: 0, totalIncome: 0 }
+    );
+  }, [groupedTransactions]);
 
   const getButtonColor = () => {
     switch (viewMode) {
@@ -249,6 +269,10 @@ export default function MonthlyBudgetShow() {
   };
 
   const getHeaderValue = (group: any) => {
+    if (group.category.type === "income") {
+      return `$${group.category.amount_budgeted.toFixed(2)}`;
+    }
+
     switch (viewMode) {
       case "Planned":
         return (
@@ -338,16 +362,28 @@ export default function MonthlyBudgetShow() {
           });
         },
       }}
+      wrapperProps={{ style: { marginBottom: "48px" } }}
     >
+      <div style={{ marginBottom: "16px" }}>
+        <Text strong>
+          Total Budgeted: ${budgetSummary.totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} of $
+          {budgetSummary.totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </Text>
+      </div>
+
       {isEditMode ? (
         <AntdList
-          dataSource={Object.values(groupedTransactions || {})}
+          dataSource={sortedCategories}
           renderItem={(group: any) => (
             <AntdList.Item
               style={{
                 cursor: "pointer",
                 display: "flex",
                 justifyContent: "space-between",
+                ...(group.category.type === "income" && {
+                  border: `2px solid ${token.colorSuccess}`,
+                  marginBottom: token.marginXS,
+                }),
               }}
             >
               <div
@@ -378,7 +414,7 @@ export default function MonthlyBudgetShow() {
         />
       ) : (
         <Collapse>
-          {Object.values(groupedTransactions || {}).map((group: any) => (
+          {sortedCategories.map((group: any) => (
             <Panel
               header={
                 <div
@@ -393,6 +429,13 @@ export default function MonthlyBudgetShow() {
                 </div>
               }
               key={group.category.id}
+              style={
+                group.category.type === "income"
+                  ? {
+                      border: `2px solid ${token.colorSuccess}`,
+                    }
+                  : {}
+              }
             >
               {group.transactions.length > 0 ? (
                 <>
@@ -492,7 +535,9 @@ export default function MonthlyBudgetShow() {
           {isEditMode ? "Leave Editing" : "Edit Categories"}
         </Button>
       </div>
-      <LogPurchaseButton />
+      {record?.id && (
+        <LogPurchaseButton monthly_budget_id={record.id.toString()} />
+      )}
     </Show>
   );
 }
