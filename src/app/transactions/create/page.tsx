@@ -17,8 +17,8 @@ export default function TransactionsCreate() {
         message: "Logged!",
         description: undefined,
         type: "success",
-      }
-    }
+      };
+    },
   });
 
   const { selectProps: categorySelectProps } = useSelect({
@@ -26,7 +26,7 @@ export default function TransactionsCreate() {
   });
 
   return (
-    <Create saveButtonProps={saveButtonProps}>
+    <Create saveButtonProps={saveButtonProps} breadcrumb={false}>
       <Form {...formProps} layout="vertical">
         <Form.Item
           label={"Title"}
