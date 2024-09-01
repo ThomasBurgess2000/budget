@@ -40,7 +40,7 @@ export default function RootLayout({
                 <Refine
                   routerProvider={routerProvider}
                   authProvider={authProviderClient}
-                  dataProvider={dataProvider}
+                  dataProvider={{ default: dataProvider }}
                   resources={[
                     {
                       name: "Current Budget",

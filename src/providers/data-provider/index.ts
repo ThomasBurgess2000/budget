@@ -1,5 +1,6 @@
 "use client";
 
+import { BaseKey, BaseRecord, DeleteOneResponse } from "@refinedev/core";
 import { dataProvider as dataProviderSupabase } from "@refinedev/supabase";
 import { supabaseBrowserClient } from "@utils/supabase/client";
 
@@ -7,8 +8,8 @@ const supabaseDataProvider = dataProviderSupabase(supabaseBrowserClient);
 
 export const dataProvider = {
   ...supabaseDataProvider,
-  deleteOne: async ({ resource, id, meta }: { resource: string; id: string; meta: any }) => {
-    if (resource === "MonthlyBudgets" && meta?.operation === "delete") {
+  deleteOne: async <TData extends BaseRecord = BaseRecord>({ resource, id }: {resource: string; id: BaseKey}): Promise<DeleteOneResponse<TData>> => {
+    if (resource === "MonthlyBudgets") {
       // Get categories associated with the monthly budget
       const { data: categories, error: categoriesFetchError } = await supabaseBrowserClient
         .from("Categories")
@@ -43,6 +44,6 @@ export const dataProvider = {
       }
     }
 
-    return supabaseDataProvider.deleteOne({ resource, id, meta });
+    return supabaseDataProvider.deleteOne({ resource, id });
   },
 };

@@ -81,17 +81,20 @@ export default function MonthlyBudgetsList() {
     );
   };
 
-  const handleRowClick = useCallback((record: any) => {
-    if (!selectedBudget) {
-      go({
-        to: {
-          resource: "MonthlyBudgets",
-          action: "show",
-          id: record.id,
-        },
-      });
-    }
-  }, [go, selectedBudget]);
+  const handleRowClick = useCallback(
+    (record: any) => {
+      if (!selectedBudget) {
+        go({
+          to: {
+            resource: "MonthlyBudgets",
+            action: "show",
+            id: record.id,
+          },
+        });
+      }
+    },
+    [go, selectedBudget]
+  );
 
   const onRow = useCallback(
     (record: any) => {
@@ -116,9 +119,7 @@ export default function MonthlyBudgetsList() {
           title="Month"
           render={(value, record: any) => (
             <Space style={{ width: "100%", justifyContent: "space-between" }}>
-              <span>
-                {dayjs(value).format("MMMM YYYY")}
-              </span>
+              <span>{dayjs(value).format("MMMM YYYY")}</span>
               {selectedBudget === record.id && (
                 <Popconfirm
                   title="Are you sure to delete this budget?"
