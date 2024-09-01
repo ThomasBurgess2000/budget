@@ -10,9 +10,6 @@ The goal is to make the flow of opening the app and logging a purchase as fast a
 8/26/24 PM  
 ![budget screenshot 8/26/24 PM](https://i.imgur.com/qLCLBI8.png)  
 
-
-So I built Budget (name subject to change lol). There's a giant "Log Purchase" button at the bottom of the page so you can get in and out.
-
 ## TODO
 
 - [x] Make back button from current budget page go to budget list page
