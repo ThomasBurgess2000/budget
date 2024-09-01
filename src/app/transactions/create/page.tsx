@@ -8,9 +8,16 @@ export default function TransactionsCreate() {
   const { goBack } = useNavigation();
 
   const { formProps, saveButtonProps } = useForm({
-    redirect: "list",
+    redirect: false,
     onMutationSuccess: () => {
       goBack();
+    },
+    successNotification: () => {
+      return {
+        message: "Logged!",
+        description: undefined,
+        type: "success",
+      };
     },
   });
 
@@ -19,7 +26,7 @@ export default function TransactionsCreate() {
   });
 
   return (
-    <Create saveButtonProps={saveButtonProps}>
+    <Create saveButtonProps={saveButtonProps} breadcrumb={false}>
       <Form {...formProps} layout="vertical">
         <Form.Item
           label={"Title"}

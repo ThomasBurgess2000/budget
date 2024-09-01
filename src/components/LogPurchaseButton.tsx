@@ -8,8 +8,8 @@ export const LogPurchaseButton: React.FC = () => {
     <button
       style={{
         position: "fixed",
-        bottom: "20px",
-        right: "20px",
+        bottom: "12px",
+        right: "12px",
         padding: "10px 20px",
         backgroundColor: "#1890ff",
         color: "#fff",

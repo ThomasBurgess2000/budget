@@ -1,7 +1,15 @@
 "use client";
 
-import { DateField, MarkdownField, NumberField, Show, TextField } from "@refinedev/antd";
-import { useOne, useShow } from "@refinedev/core";
+import {
+  DateField,
+  DeleteButton,
+  EditButton,
+  MarkdownField,
+  NumberField,
+  Show,
+  TextField,
+} from "@refinedev/antd";
+import { useNavigation, useOne, useShow } from "@refinedev/core";
 import { Typography } from "antd";
 
 const { Title } = Typography;
@@ -9,6 +17,7 @@ const { Title } = Typography;
 export default function TransactionsShow() {
   const { queryResult } = useShow({});
   const { data, isLoading } = queryResult;
+  const { goBack } = useNavigation();
 
   const record = data?.data;
 
@@ -21,7 +30,18 @@ export default function TransactionsShow() {
   });
 
   return (
-    <Show isLoading={isLoading}>
+    <Show
+      isLoading={isLoading}
+      headerButtons={({ deleteButtonProps, editButtonProps }) => (
+        <>
+          <EditButton />
+          {deleteButtonProps && (
+            <DeleteButton {...deleteButtonProps} onSuccess={() => goBack()} />
+          )}
+        </>
+      )}
+      breadcrumb={false}
+    >
       <Title level={5}>{"Title"}</Title>
       <TextField value={record?.title} />
       <Title level={5}>{"Amount"}</Title>

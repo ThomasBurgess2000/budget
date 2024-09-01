@@ -28,7 +28,7 @@ export default function TransactionsList() {
   });
 
   return (
-    <List>
+    <List breadcrumb={false}>
       <Table {...tableProps} rowKey="id">
         <Table.Column dataIndex="title" title={"Title"} />
         <Table.Column
