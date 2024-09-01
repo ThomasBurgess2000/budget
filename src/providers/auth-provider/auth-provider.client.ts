@@ -190,6 +190,10 @@ export const authProviderClient: AuthProvider = {
       });
 
       if (error) {
+        notification.error({
+          message: "Failed to update password.",
+          description: error.message,
+        });
         return {
           success: false,
           error,
@@ -203,6 +207,10 @@ export const authProviderClient: AuthProvider = {
         };
       }
     } catch (error: any) {
+      notification.error({
+        message: "Failed to update password.",
+        description: error.message,
+      });
       return {
         success: false,
         error,
