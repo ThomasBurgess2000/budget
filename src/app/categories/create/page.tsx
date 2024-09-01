@@ -1,7 +1,7 @@
 "use client";
 
 import { Create, useForm } from "@refinedev/antd";
-import { useGo } from "@refinedev/core";
+import { useGo, useNotification } from "@refinedev/core";
 import { Form, Input, InputNumber } from "antd";
 import { useSearchParams } from "next/navigation";
 
@@ -10,6 +10,7 @@ export default function CategoryCreate() {
   const monthly_budget_id = searchParams.get("monthly_budget_id");
 
   const go = useGo();
+  const { open } = useNotification();
 
   const { formProps, saveButtonProps } = useForm({
     redirect: false, 
@@ -28,6 +29,14 @@ export default function CategoryCreate() {
         go({ to: { resource: "Categories", action: "list" } });
       }
     },
+    onMutationError: (error) => {
+      console.error("Mutation error:", error);
+      open?.({
+        type: "error",
+        message: "Failed to create category",
+        description: "Please try again or contact support if the issue persists.",
+      });
+    },
   });
 
   return (
@@ -36,6 +45,7 @@ export default function CategoryCreate() {
         {...formProps}
         layout="vertical"
         onFinish={(values) => {
+          console.log("Form values:", values); // Log form values before submission
           return formProps.onFinish?.({
             ...values,
             monthly_budget: monthly_budget_id,
