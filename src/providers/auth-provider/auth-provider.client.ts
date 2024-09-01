@@ -2,6 +2,7 @@
 
 import type { AuthProvider } from "@refinedev/core";
 import { supabaseBrowserClient } from "@utils/supabase/client";
+import { notification } from "antd";
 
 export const authProviderClient: AuthProvider = {
   login: async ({ email, password }) => {
@@ -140,4 +141,80 @@ export const authProviderClient: AuthProvider = {
 
     return { error };
   },
+  forgotPassword: async ({ email }) => {
+    try {
+      const { data, error } = await supabaseBrowserClient.auth.resetPasswordForEmail(
+        email,
+        {
+          redirectTo: `${window.location.origin}/update-password`,
+        },
+      );
+
+      if (error) {
+        return {
+          success: false,
+          error,
+        };
+      }
+
+      if (data) {
+        notification.open({
+          type: "success",
+          message: "Success",
+          description:
+            "Please check your email for a link to reset your password. If it doesn't appear within a few minutes, check your spam folder.",
+        });
+        return {
+          success: true,
+        };
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        error,
+      };
+    }
+
+    return {
+      success: false,
+      error: {
+        message: "Forgot password failed",
+        name: "Invalid email",
+      },
+    };
+  },
+  updatePassword: async ({ password }) => {
+    try {
+      const { data, error } = await supabaseBrowserClient.auth.updateUser({
+        password,
+      });
+
+      if (error) {
+        return {
+          success: false,
+          error,
+        };
+      }
+
+      if (data) {
+        return {
+          success: true,
+          redirectTo: "/",
+        };
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        error,
+      };
+    }
+    return {
+      success: false,
+      error: {
+        message: "Update password failed",
+        name: "Invalid password",
+      },
+    };
+  },
+
 };
