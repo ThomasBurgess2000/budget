@@ -9,8 +9,8 @@ The goal is to make the flow of opening the app and logging a purchase as fast a
 ![budget screenshot 8/26/24 AM](https://i.imgur.com/5aU6WBE.png)  
 8/26/24 PM  
 ![budget screenshot 8/26/24 PM](https://i.imgur.com/qLCLBI8.png)  
-9/1/24 PM
-![budget screenshot 9/1/24 PM](https://i.imgur.com/EQpxRA6.png)
+9/1/24 PM  
+![budget screenshot 9/1/24 PM](https://i.imgur.com/EQpxRA6.png)  
 
 ## TODO
 
