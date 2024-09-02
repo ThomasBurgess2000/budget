@@ -10,30 +10,23 @@ import {
   useDelete,
 } from "@refinedev/core";
 import { Show } from "@refinedev/antd";
-import {
-  Typography,
-  Collapse,
-  List as AntdList,
-  Button,
-  Modal,
-  InputNumber,
-  theme,
-} from "antd";
+import { Typography, Button, Modal, theme } from "antd";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 import { LogPurchaseButton } from "@components/LogPurchaseButton";
-import { DeleteOutlined } from "@ant-design/icons";
+import BudgetSummary from "./components/BudgetSummary";
+import EditModeList from "./components/EditModeList";
+import CategoryList from "./components/CategoryList";
 
-interface Transaction {
+export interface Transaction {
   id: string;
   title: string;
   amount: number;
   created_at: string;
 }
 
-const { Title, Text } = Typography;
-const { Panel } = Collapse;
+const { Title } = Typography;
 
 export default function MonthlyBudgetShow() {
   const [viewMode, setViewMode] = useState<"Planned" | "Spent" | "Remaining">(
@@ -131,7 +124,7 @@ export default function MonthlyBudgetShow() {
     }, {});
   }, [prevCategoriesData, prevTransactionsData]);
 
-  const { data: transactionsData, isLoading: transactionsIsLoading } = useList({
+  const { data: transactionsData } = useList({
     resource: "Transactions",
     queryOptions: {
       enabled: !!record,
@@ -156,7 +149,7 @@ export default function MonthlyBudgetShow() {
     },
   });
 
-  const { data: categoriesData, isLoading: categoriesIsLoading } = useList({
+  const { data: categoriesData } = useList({
     resource: "Categories",
     filters: [
       {
@@ -198,22 +191,6 @@ export default function MonthlyBudgetShow() {
   const sortedCategories = Object.values(groupedTransactions || {}).sort(
     (a: any, b: any) => b.transactionCount - a.transactionCount
   );
-
-  const budgetSummary = useMemo(() => {
-    if (!groupedTransactions) return { totalExpenses: 0, totalIncome: 0 };
-
-    return Object.values(groupedTransactions).reduce(
-      (acc, group: any) => {
-        if (group.category.type === "income") {
-          acc.totalIncome += group.category.amount_budgeted;
-        } else {
-          acc.totalExpenses += group.category.amount_budgeted;
-        }
-        return acc;
-      },
-      { totalExpenses: 0, totalIncome: 0 }
-    );
-  }, [groupedTransactions]);
 
   const getButtonColor = () => {
     switch (viewMode) {
@@ -266,45 +243,6 @@ export default function MonthlyBudgetShow() {
       });
     }
     setEditingCategory(null);
-  };
-
-  const getHeaderValue = (group: any) => {
-    if (group.category.type === "income") {
-      return `$${group.category.amount_budgeted.toFixed(2)}`;
-    }
-
-    switch (viewMode) {
-      case "Planned":
-        return (
-          <span onClick={() => handleAmountClick(group.category.id)}>
-            {editingCategory === group.category.id ? (
-              <InputNumber
-                defaultValue={group.category.amount_budgeted}
-                onBlur={(e) =>
-                  handleAmountChange(
-                    group.category.id,
-                    parseFloat(e.target.value)
-                  )
-                }
-                onPressEnter={(e) =>
-                  handleAmountChange(
-                    group.category.id,
-                    parseFloat((e.target as HTMLInputElement).value)
-                  )
-                }
-                autoFocus
-                style={{ width: "100px" }}
-              />
-            ) : (
-              `$${group.category.amount_budgeted.toFixed(2)}`
-            )}
-          </span>
-        );
-      case "Spent":
-        return `$${group.total.toFixed(2)}`;
-      case "Remaining":
-        return `$${(group.category.amount_budgeted - group.total).toFixed(2)}`;
-    }
   };
 
   const handleDeleteCategory = (categoryId: string) => {
@@ -369,161 +307,27 @@ export default function MonthlyBudgetShow() {
         className: "w-full md:w-1/2 mx-auto",
       }}
     >
-      <div style={{ marginBottom: "16px" }}>
-        <Text strong>
-          Total Budgeted: $
-          {budgetSummary.totalExpenses.toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}{" "}
-          of $
-          {budgetSummary.totalIncome.toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </Text>
-      </div>
+      <BudgetSummary groupedTransactions={groupedTransactions} />
 
       {isEditMode ? (
-        <AntdList
-          dataSource={sortedCategories}
-          renderItem={(group: any) => (
-            <AntdList.Item
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                justifyContent: "space-between",
-                ...(group.category.type === "income" && {
-                  border: `2px solid ${token.colorSuccess}`,
-                  marginBottom: token.marginXS,
-                }),
-              }}
-            >
-              <div
-                onClick={() =>
-                  go({
-                    to: {
-                      resource: "Categories",
-                      action: "edit",
-                      id: group.category.id,
-                    },
-                  })
-                }
-              >
-                <Text>{group.category.title}</Text>
-              </div>
-              <div>
-                <Text>${group.category.amount_budgeted.toFixed(2)}</Text>
-                <DeleteOutlined
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteCategory(group.category.id);
-                  }}
-                  style={{ marginLeft: "16px", color: "#ff4d4f" }}
-                />
-              </div>
-            </AntdList.Item>
-          )}
+        <EditModeList
+          sortedCategories={sortedCategories}
+          go={go}
+          token={token}
+          handleDeleteCategory={handleDeleteCategory}
         />
       ) : (
-        <Collapse>
-          {sortedCategories.map((group: any) => (
-            <Panel
-              header={
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <span>{group.category.title}</span>
-                  <span>{getHeaderValue(group)}</span>
-                </div>
-              }
-              key={group.category.id}
-              style={
-                group.category.type === "income"
-                  ? {
-                      border: `2px solid ${token.colorSuccess}`,
-                    }
-                  : {}
-              }
-            >
-              {group.transactions.length > 0 ? (
-                <>
-                  {Object.entries(
-                    group.transactions.reduce(
-                      (
-                        acc: Record<string, Transaction[]>,
-                        transaction: Transaction
-                      ) => {
-                        const date = dayjs(transaction.created_at).format("Do");
-                        if (!acc[date]) acc[date] = [];
-                        acc[date].push(transaction);
-                        return acc;
-                      },
-                      {}
-                    )
-                  ).map(([date, transactions]) => (
-                    <div key={date}>
-                      <Text
-                        strong
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          borderBottom: "1px solid #e8e8e8",
-                          paddingBottom: "4px",
-                        }}
-                      >
-                        {date}
-                      </Text>
-                      <AntdList
-                        dataSource={transactions as Transaction[]}
-                        renderItem={(item: Transaction) => (
-                          <AntdList.Item
-                            onClick={() =>
-                              go({
-                                to: {
-                                  resource: "Transactions",
-                                  action: "show",
-                                  id: item.id,
-                                },
-                              })
-                            }
-                            style={{
-                              cursor: "pointer",
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <Text>{item.title}</Text>
-                            <Text>${item.amount.toFixed(2)}</Text>
-                          </AntdList.Item>
-                        )}
-                      />
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <>
-                  <Text>No transactions for this category yet.</Text>
-                  {rolloverAmounts[group.category.title] > 0 && (
-                    <Button
-                      onClick={() =>
-                        handleRollover(group.category.id, group.category.title)
-                      }
-                      style={{ marginTop: "8px" }}
-                    >
-                      Rollover $
-                      {rolloverAmounts[group.category.title].toFixed(2)}?
-                    </Button>
-                  )}
-                </>
-              )}
-            </Panel>
-          ))}
-        </Collapse>
+        <CategoryList
+          viewMode={viewMode}
+          handleAmountClick={handleAmountClick}
+          handleAmountChange={handleAmountChange}
+          editingCategory={editingCategory}
+          rolloverAmounts={rolloverAmounts}
+          handleRollover={handleRollover}
+          go={go}
+          token={token}
+          sortedCategories={sortedCategories}
+        />
       )}
       <div style={{ marginTop: "16px", float: "right" }}>
         {isEditMode && (
