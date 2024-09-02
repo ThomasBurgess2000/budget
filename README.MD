@@ -1,6 +1,6 @@
-# Budget<sup>*</sup>
+# Abacus
 
-Budget<sup>*</sup> is a in-and-out purchase logging app built with [Refine](https://github.com/refinedev/refine) and [Supabase](https://supabase.com/).
+Abacus is an open-source budgeting app built with [Refine](https://github.com/refinedev/refine) and [Supabase](https://supabase.com/). You can try it for yourself here: [abacus.academy](http://abacus.academy).
 
 The goal is to make the flow of opening the app and logging a purchase as fast as possible. I found other budgeting apps too tedious. They would take too long to load, there'd be a pop-up shilling you their premium offering, the UI was cluttered with features I didn't use, and logging required too many clicks.
 
@@ -9,6 +9,8 @@ The goal is to make the flow of opening the app and logging a purchase as fast a
 ![budget screenshot 8/26/24 AM](https://i.imgur.com/5aU6WBE.png)  
 8/26/24 PM  
 ![budget screenshot 8/26/24 PM](https://i.imgur.com/qLCLBI8.png)  
+9/1/24 PM  
+![budget screenshot 9/1/24 PM](https://i.imgur.com/EQpxRA6.png)  
 
 ## TODO
 
@@ -20,6 +22,4 @@ The goal is to make the flow of opening the app and logging a purchase as fast a
 - [ ] make better savings fund category than everydollar
 - [ ] allow reordering categories
 - [x] add income
-
-<sup>*</sup>name pending
 
