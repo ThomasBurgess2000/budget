@@ -1,6 +1,6 @@
 # Abacus
 
-Abacus is an open-source budgeting app built with [Refine](https://github.com/refinedev/refine) and [Supabase](https://supabase.com/).
+Abacus is an open-source budgeting app built with [Refine](https://github.com/refinedev/refine) and [Supabase](https://supabase.com/). You can try it for yourself here: [abacus.academy](http://abacus.academy).
 
 The goal is to make the flow of opening the app and logging a purchase as fast as possible. I found other budgeting apps too tedious. They would take too long to load, there'd be a pop-up shilling you their premium offering, the UI was cluttered with features I didn't use, and logging required too many clicks.
 
