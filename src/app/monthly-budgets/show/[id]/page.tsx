@@ -362,12 +362,25 @@ export default function MonthlyBudgetShow() {
           });
         },
       }}
-      wrapperProps={{ style: { marginBottom: "48px" } }}
+      wrapperProps={{
+        style: {
+          marginBottom: "48px",
+        },
+        className: "w-full md:w-1/2 mx-auto",
+      }}
     >
       <div style={{ marginBottom: "16px" }}>
         <Text strong>
-          Total Budgeted: ${budgetSummary.totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} of $
-          {budgetSummary.totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          Total Budgeted: $
+          {budgetSummary.totalExpenses.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}{" "}
+          of $
+          {budgetSummary.totalIncome.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
         </Text>
       </div>
 

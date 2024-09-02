@@ -22,7 +22,7 @@ So I built Budget (name subject to change lol). There's a giant "Log Purchase" b
 - [x] when starting new month, optionally copy rollover unspent money from previous month (doesn't increase planned, but does make spent negative)
 - [ ] make better savings fund category than everydollar
 - [ ] allow reordering categories
-- [ ] add income
+- [x] add income
 
 <sup>*</sup>name pending
 

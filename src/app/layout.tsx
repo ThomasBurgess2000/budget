@@ -12,9 +12,10 @@ import { ColorModeContextProvider } from "@contexts/color-mode";
 import { authProviderClient } from "@providers/auth-provider";
 import { dataProvider } from "@providers/data-provider";
 import "@refinedev/antd/dist/reset.css";
+import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "QuickLog",
+  title: "Abacus",
   description: "An in and out budgeting app",
   icons: {
     icon: "/favicon.ico",

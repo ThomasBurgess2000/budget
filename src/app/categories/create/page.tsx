@@ -59,7 +59,7 @@ export default function CategoryCreate() {
           label="Type"
           name="type"
           rules={[{ required: true }]}
-          initialValue="Expense"
+          initialValue="expense"
         >
           <Radio.Group>
             <Radio value="expense">Expense</Radio>
