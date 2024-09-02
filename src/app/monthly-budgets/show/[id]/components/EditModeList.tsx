@@ -24,10 +24,11 @@ export default function EditModeList({
             cursor: "pointer",
             display: "flex",
             justifyContent: "space-between",
-            ...(group.category.type === "income" && {
-              border: `2px solid ${token.colorSuccess}`,
-              marginBottom: token.marginXS,
-            }),
+            paddingLeft: "6px",
+            ...(group.category.type === "income" ? {
+                boxShadow: `3px 0 0 ${token.colorSuccess} inset`,
+              }
+            : { boxShadow: `3px 0 0 orange inset` }),
           }}
         >
           <div

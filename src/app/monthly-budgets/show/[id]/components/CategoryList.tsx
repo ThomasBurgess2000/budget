@@ -94,9 +94,9 @@ export default function CategoryList({
           style={
             group.category.type === "income"
               ? {
-                  border: `2px solid ${token.colorSuccess}`,
+                  boxShadow: `3px 0 0 ${token.colorSuccess} inset`,
                 }
-              : {}
+              : { boxShadow: `3px 0 0 orange inset` }
           }
         >
           {group.transactions.length > 0 ? (
@@ -156,17 +156,19 @@ export default function CategoryList({
             </>
           ) : (
             <>
-              <Text>No transactions for this category yet.</Text>
-              {rolloverAmounts[group.category.title] > 0 && (
-                <Button
-                  onClick={() =>
-                    handleRollover(group.category.id, group.category.title)
-                  }
-                  style={{ marginTop: "8px" }}
-                >
-                  Rollover ${rolloverAmounts[group.category.title].toFixed(2)}?
-                </Button>
-              )}
+              <div className="md:flex md:items-center">
+                <Text>No transactions for this category yet.</Text>
+                {rolloverAmounts[group.category.title] > 0 && (
+                  <Button
+                    onClick={() =>
+                      handleRollover(group.category.id, group.category.title)
+                    }
+                    className="md:ml-2 mt-2"
+                  >
+                    Rollover ${rolloverAmounts[group.category.title].toFixed(2)}?
+                  </Button>
+                )}
+              </div>
             </>
           )}
         </Panel>

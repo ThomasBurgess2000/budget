@@ -18,6 +18,7 @@ export default function TransactionsCreate() {
   >(null);
   const [titleInput, setTitleInput] = useState("");
   const [debouncedTitleInput] = useDebounce(titleInput, 300);
+  const [userSelectedCategory, setUserSelectedCategory] = useState(false);
 
   const { formProps, saveButtonProps, onFinish } = useForm({
     redirect: false,
@@ -114,7 +115,7 @@ export default function TransactionsCreate() {
     if (
       debouncedTitleInput &&
       similarTransactionsData &&
-      !form.getFieldValue("category")
+      !userSelectedCategory // Check if user hasn't selected a category
     ) {
       const similarTransaction = similarTransactionsData.data[0];
       if (similarTransaction && similarTransaction.category && categoryData) {
@@ -123,7 +124,13 @@ export default function TransactionsCreate() {
         setSelectedCategoryTitle(categoryTitle);
       }
     }
-  }, [debouncedTitleInput, similarTransactionsData, form, categoryData]);
+  }, [
+    debouncedTitleInput,
+    similarTransactionsData,
+    form,
+    categoryData,
+    userSelectedCategory,
+  ]);
 
   const getMostCommonTitle = (titles: string[]): string | null => {
     const titleCounts = titles.reduce((acc, title) => {
@@ -153,6 +160,12 @@ export default function TransactionsCreate() {
         },
       }}
       breadcrumb={false}
+      wrapperProps={{
+        style: {
+          marginBottom: "48px",
+        },
+        className: "w-full md:w-1/2 mx-auto",
+      }}
     >
       <Form
         {...formProps}
@@ -169,6 +182,7 @@ export default function TransactionsCreate() {
             {...categorySelectProps}
             onChange={(value: any, option: any) => {
               setSelectedCategoryTitle(option?.label ?? null);
+              setUserSelectedCategory(true); // Set flag when user selects a category
             }}
           />
         </Form.Item>
@@ -180,7 +194,8 @@ export default function TransactionsCreate() {
           <Input
             onChange={(e) => setTitleInput(e.target.value)}
             onFocus={(e) => {
-              if (e.target.value) {
+              // Only clear the title if it was auto-populated and not manually entered
+              if (e.target.value && !titleInput) {
                 form.setFieldsValue({ title: "" });
               }
             }}

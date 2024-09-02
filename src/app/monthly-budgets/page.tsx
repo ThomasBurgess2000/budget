@@ -114,7 +114,16 @@ export default function MonthlyBudgetsList() {
   );
 
   return (
-    <List breadcrumb={false} title="Monthly Budgets">
+    <List
+      breadcrumb={false}
+      title="Monthly Budgets"
+      wrapperProps={{
+        style: {
+          marginBottom: "48px",
+        },
+        className: "w-full md:w-1/2 mx-auto",
+      }}
+    >
       <Table {...tableProps} rowKey="id" showHeader={false} onRow={onRow}>
         <Table.Column
           dataIndex="month"

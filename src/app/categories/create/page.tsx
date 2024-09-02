@@ -41,7 +41,15 @@ export default function CategoryCreate() {
   });
 
   return (
-    <Create saveButtonProps={saveButtonProps}>
+    <Create
+      saveButtonProps={saveButtonProps}
+      wrapperProps={{
+        style: {
+          marginBottom: "48px",
+        },
+        className: "w-full md:w-1/2 mx-auto",
+      }}
+    >
       <Form
         {...formProps}
         layout="vertical"

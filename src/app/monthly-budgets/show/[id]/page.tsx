@@ -189,7 +189,18 @@ export default function MonthlyBudgetShow() {
 
   // Sort categories by transaction count in descending order
   const sortedCategories = Object.values(groupedTransactions || {}).sort(
-    (a: any, b: any) => b.transactionCount - a.transactionCount
+    (a: any, b: any) => {
+      // Check if either category is an income category
+      const aIsIncome = a.category.type === "income";
+      const bIsIncome = b.category.type === "income";
+
+      // If one is income and the other isn't, prioritize the income category
+      if (aIsIncome && !bIsIncome) return -1;
+      if (!aIsIncome && bIsIncome) return 1;
+
+      // If both are income or both are not income, sort by transaction count
+      return b.transactionCount - a.transactionCount;
+    }
   );
 
   const getButtonColor = () => {
