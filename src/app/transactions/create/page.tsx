@@ -2,10 +2,14 @@
 
 import { Create, useForm, useSelect } from "@refinedev/antd";
 import { useNavigation, useList, useOne } from "@refinedev/core";
-import { Form, Input, Select, Button } from "antd"; // Add Button import
+import { Form, Input, Select, Row, Col, InputNumber } from "antd"; // Add DatePicker import
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDebounce } from "use-debounce";
+import dayjs from "dayjs";
+import CustomDatePicker from "./DatePicker";
+
+const { Option } = Select;
 
 export default function TransactionsCreate() {
   const searchParams = useSearchParams();
@@ -19,6 +23,15 @@ export default function TransactionsCreate() {
   const [titleInput, setTitleInput] = useState("");
   const [debouncedTitleInput] = useDebounce(titleInput, 300);
   const [userSelectedCategory, setUserSelectedCategory] = useState(false);
+  const [selectBeforeValue, setSelectBeforeValue] = useState("add");
+
+  const handleAmountChange = (plusMinus: string, amount: number | null) => {
+    if (amount !== null) {
+      const adjustedValue =
+        plusMinus === "minus" ? -Math.abs(amount) : Math.abs(amount);
+      formProps.form?.setFieldsValue({ amount: adjustedValue });
+    }
+  };
 
   const { formProps, saveButtonProps, onFinish } = useForm({
     redirect: false,
@@ -36,6 +49,10 @@ export default function TransactionsCreate() {
 
   const handleSubmit = async (values: any) => {
     try {
+      // Ensure the amount is negative if "minus" is selected
+      if (selectBeforeValue === "minus") {
+        values.amount = -Math.abs(values.amount);
+      }
       await onFinish(values);
     } catch (error) {
       console.error("Form submission error:", error);
@@ -132,6 +149,12 @@ export default function TransactionsCreate() {
     userSelectedCategory,
   ]);
 
+  useEffect(() => {
+    if (titleInput === "Rollover") {
+      setSelectBeforeValue("minus");
+    }
+  }, [titleInput, form]);
+
   const getMostCommonTitle = (titles: string[]): string | null => {
     const titleCounts = titles.reduce((acc, title) => {
       acc[title] = (acc[title] || 0) + 1;
@@ -145,11 +168,16 @@ export default function TransactionsCreate() {
       if (count > maxCount) {
         maxCount = count;
         mostCommonTitle = title;
+        if (title === "Rollover") {
+          setSelectBeforeValue("minus");
+        }
       }
     }
 
     return mostCommonTitle;
   };
+
+  const currentDate = dayjs();
 
   return (
     <Create
@@ -172,6 +200,12 @@ export default function TransactionsCreate() {
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
+        initialValues={{
+          ...formProps.initialValues,
+          created_at: formProps.initialValues?.created_at
+            ? dayjs(formProps.initialValues.created_at)
+            : currentDate,
+        }}
       >
         <Form.Item
           label={"Category"}
@@ -192,7 +226,12 @@ export default function TransactionsCreate() {
           rules={[{ required: true }]}
         >
           <Input
-            onChange={(e) => setTitleInput(e.target.value)}
+            onChange={(e) => {
+              setTitleInput(e.target.value);
+              if (e.target.value === "Rollover") {
+                setSelectBeforeValue("minus");
+              }
+            }}
             onFocus={(e) => {
               // Only clear the title if it was auto-populated and not manually entered
               if (e.target.value && !titleInput) {
@@ -201,9 +240,43 @@ export default function TransactionsCreate() {
             }}
           />
         </Form.Item>
-        <Form.Item label={"Amount"} name="amount" rules={[{ required: true }]}>
-          <Input type="number" />
-        </Form.Item>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label={"Amount"}
+              name="amount"
+              rules={[{ required: true }]}
+            >
+              <InputNumber
+                addonBefore={
+                  <Select
+                    value={selectBeforeValue}
+                    style={{ width: 60 }}
+                    onChange={(value) => {
+                      setSelectBeforeValue(value);
+                      const currentAmount = form.getFieldValue("amount");
+                      handleAmountChange(value, currentAmount);
+                    }}
+                  >
+                    <Option value="add">+</Option>
+                    <Option value="minus">-</Option>
+                  </Select>
+                }
+                changeOnWheel={false}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label={"Date"}
+              name="created_at"
+              rules={[{ required: true }]}
+            >
+              <CustomDatePicker />
+            </Form.Item>
+          </Col>
+        </Row>
       </Form>
     </Create>
   );
