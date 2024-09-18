@@ -44,13 +44,6 @@ export default function RootLayout({
                   dataProvider={{ default: dataProvider }}
                   resources={[
                     {
-                      name: "Current Budget",
-                      list: "/current-budget",
-                      meta: {
-                        label: "Current Budget",
-                      },
-                    },
-                    {
                       name: "Detailed Views",
                     },
                     {
