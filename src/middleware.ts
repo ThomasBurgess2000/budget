@@ -7,20 +7,33 @@ export async function middleware(request: NextRequest) {
 
   // Handle /current-budget redirection
   if (request.nextUrl.pathname === "/current-budget") {
-    const response = await fetch(new URL("/api/current-budget", request.url), {
-      headers: {
-        // Forward the cookies to the API route
-        Cookie: request.headers.get("cookie") || "",
-      },
-    });
-    const data = await response.json();
+    // Use an environment variable for the internal API base URL
+    const internalApiBaseUrl = process.env.INTERNAL_API_BASE_URL || "http://localhost:3000";
+    const internalURL = `${internalApiBaseUrl}/api/current-budget`;
 
-    if (data.budgetId) {
-      return NextResponse.redirect(
-        new URL(`/monthly-budgets/show/${data.budgetId}`, request.url)
-      );
-    } else {
-      return NextResponse.redirect(new URL("/monthly-budgets", request.url));
+    try {
+      const response = await fetch(internalURL, {
+        headers: {
+          Cookie: request.headers.get("cookie") || "",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API response not ok: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.budgetId) {
+        return NextResponse.redirect(
+          new URL(`/monthly-budgets/show/${data.budgetId}`, request.url)
+        );
+      } else {
+        return NextResponse.redirect(new URL("/monthly-budgets", request.url));
+      }
+    } catch (error) {
+      console.error("Middleware fetch error:", error);
+      return NextResponse.redirect(new URL("/error", request.url));
     }
   }
 
