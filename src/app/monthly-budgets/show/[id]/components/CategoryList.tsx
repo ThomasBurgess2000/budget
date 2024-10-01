@@ -11,7 +11,13 @@ import {
 import { Transaction } from "../page";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
 dayjs.extend(advancedFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const { Text } = Typography;
 
 const { Panel } = Collapse;
@@ -107,7 +113,8 @@ export default function CategoryList({
                     acc: Record<string, Transaction[]>,
                     transaction: Transaction
                   ) => {
-                    const date = dayjs(transaction.created_at).format("Do");
+                    // Convert the date to UTC, then format it
+                    const date = dayjs(transaction.created_at).utc().format("Do");
                     if (!acc[date]) acc[date] = [];
                     acc[date].push(transaction);
                     return acc;
@@ -147,7 +154,7 @@ export default function CategoryList({
                         }}
                       >
                         <Text>{item.title}</Text>
-                        <Text>${item.amount.toFixed(2)}</Text>
+                        <Text>{item.amount < 0 ? Math.abs(item.amount).toFixed(2) : (-item.amount).toFixed(2)}</Text>
                       </AntdList.Item>
                     )}
                   />

@@ -2,7 +2,7 @@
 
 import { Create, useForm, useSelect } from "@refinedev/antd";
 import { useNavigation, useList, useOne } from "@refinedev/core";
-import { Form, Input, Select, Row, Col, InputNumber } from "antd"; // Add DatePicker import
+import { Form, Input, Select, Row, Col, InputNumber, Checkbox } from "antd";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDebounce } from "use-debounce";
@@ -24,6 +24,7 @@ export default function TransactionsCreate() {
   const [debouncedTitleInput] = useDebounce(titleInput, 300);
   const [userSelectedCategory, setUserSelectedCategory] = useState(false);
   const [selectBeforeValue, setSelectBeforeValue] = useState("add");
+  const [continueLogging, setContinueLogging] = useState(false);
 
   const handleAmountChange = (plusMinus: string, amount: number | null) => {
     if (amount !== null) {
@@ -36,7 +37,14 @@ export default function TransactionsCreate() {
   const { formProps, saveButtonProps, onFinish } = useForm({
     redirect: false,
     onMutationSuccess: () => {
-      goBack();
+      if (!continueLogging) {
+        goBack();
+      } else {
+        // Clear the form
+        form.resetFields();
+        // Reset the date to the current date
+        form.setFieldsValue({ created_at: dayjs() });
+      }
     },
     successNotification: () => {
       return {
@@ -53,6 +61,17 @@ export default function TransactionsCreate() {
       if (selectBeforeValue === "minus") {
         values.amount = -Math.abs(values.amount);
       }
+
+      // Format the created_at field as a date-only string
+      if (values.created_at) {
+        values.created_at = values.created_at.format("YYYY-MM-DD");
+      }
+      
+      setTitleInput("");
+      setUserSelectedCategory(false);
+      setSelectBeforeValue("add");
+      setSelectedCategoryTitle(null);
+
       await onFinish(values);
     } catch (error) {
       console.error("Form submission error:", error);
@@ -130,24 +149,21 @@ export default function TransactionsCreate() {
 
   useEffect(() => {
     if (
+      titleInput !== "" &&
       debouncedTitleInput &&
       similarTransactionsData &&
       !userSelectedCategory // Check if user hasn't selected a category
     ) {
       const similarTransaction = similarTransactionsData.data[0];
       if (similarTransaction && similarTransaction.category && categoryData) {
+        const categoryId = similarTransaction.category; // Get the category ID
         const categoryTitle = categoryData.data?.title;
-        form.setFieldsValue({ category: categoryTitle });
+        if (!categoryTitle) return; // If the category title is null, return
+        form.setFieldsValue({ category: categoryId }); // Set the category ID
         setSelectedCategoryTitle(categoryTitle);
       }
     }
-  }, [
-    debouncedTitleInput,
-    similarTransactionsData,
-    form,
-    categoryData,
-    userSelectedCategory,
-  ]);
+  }, [debouncedTitleInput, similarTransactionsData, form, categoryData, userSelectedCategory, titleInput]);
 
   useEffect(() => {
     if (titleInput === "Rollover") {
@@ -194,6 +210,7 @@ export default function TransactionsCreate() {
         },
         className: "w-full md:w-1/2 mx-auto",
       }}
+      headerButtons={({ defaultButtons }) => <>{defaultButtons}</>}
     >
       <Form
         {...formProps}
@@ -258,8 +275,8 @@ export default function TransactionsCreate() {
                       handleAmountChange(value, currentAmount);
                     }}
                   >
-                    <Option value="add">+</Option>
-                    <Option value="minus">-</Option>
+                    <Option value="add">-</Option>
+                    <Option value="minus">+</Option>
                   </Select>
                 }
                 changeOnWheel={false}
@@ -278,6 +295,12 @@ export default function TransactionsCreate() {
           </Col>
         </Row>
       </Form>
+      <Checkbox
+        checked={continueLogging}
+        onChange={(e) => setContinueLogging(e.target.checked)}
+      >
+        Continue Logging
+      </Checkbox>
     </Create>
   );
 }

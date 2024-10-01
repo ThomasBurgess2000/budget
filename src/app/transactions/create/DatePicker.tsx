@@ -20,9 +20,16 @@ const MyDatePanel = (props: GetProps<DateComponent>) => {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollLeft = 2 * 60; // Center the selected day (60px is the width of each day item)
+      const dayWidth = 60; // Width of each day item in pixels
+      const containerWidth = scrollRef.current.clientWidth;
+      const selectedDayPosition = (currentDay - 1) * dayWidth;
+      let newScrollLeft =
+        selectedDayPosition - containerWidth / 2 + dayWidth / 2;
+      const maxScrollLeft = scrollRef.current.scrollWidth - containerWidth;
+      newScrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
+      scrollRef.current.scrollLeft = newScrollLeft;
     }
-  }, [innerValue]);
+  }, [innerValue, currentDay]);
 
   const handleDaySelect = (day: number) => {
     const newDate = innerValue.date(day);
@@ -65,10 +72,14 @@ interface CustomDatePickerProps {
   onChange?: (date: Dayjs | null) => void;
 }
 
-const CustomDatePicker: React.FC<CustomDatePickerProps> = ({ value, onChange }) => {
+const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
+  value,
+  onChange,
+}) => {
   const handleDateChange: DatePickerProps["onChange"] = (date) => {
     if (date && onChange) {
-      onChange(date);
+      const dateOnly = date.startOf("day");
+      onChange(dateOnly);
     }
   };
 

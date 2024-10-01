@@ -11,6 +11,12 @@ import {
 } from "@refinedev/antd";
 import { useNavigation, useOne, useShow } from "@refinedev/core";
 import { Typography } from "antd";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const { Title } = Typography;
 
@@ -53,7 +59,9 @@ export default function TransactionsShow() {
         }
       />
       <Title level={5}>{"Created At"}</Title>
-      <DateField value={record?.created_at} />
+      <DateField
+        value={dayjs(record?.created_at).utc().format("YYYY-MM-DD HH:mm:ss")}
+      />
     </Show>
   );
 }

@@ -4,6 +4,9 @@ import dayjs from "dayjs";
 import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 
+// Add this line to make the route dynamic
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   // Initialize Supabase client with Auth Helpers
   const supabase = createRouteHandlerClient({ cookies });

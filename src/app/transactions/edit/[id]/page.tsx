@@ -5,6 +5,11 @@ import { Edit, useForm, useSelect } from "@refinedev/antd";
 import { Form, Input, Select, Row, Col, InputNumber } from "antd";
 import { useState } from "react";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const { Option } = Select;
 
@@ -73,7 +78,7 @@ export default function TransactionsEdit() {
         initialValues={{
           ...formProps.initialValues,
           created_at: formProps.initialValues?.created_at
-            ? dayjs(formProps.initialValues.created_at)
+            ? dayjs(formProps.initialValues.created_at).utc()
             : undefined,
         }}
       >
@@ -133,7 +138,7 @@ export default function TransactionsEdit() {
               name="created_at"
               rules={[{ required: true }]}
               getValueProps={(value) => ({
-                value: value ? dayjs(value) : undefined,
+                value: value ? dayjs(value).utc() : undefined,
               })}
             >
               <CustomDatePicker />
