@@ -9,11 +9,13 @@ export default function EditModeList({
   handleDeleteCategory,
   go,
   token,
+  monthly_budget_id,
 }: {
   sortedCategories: any[];
   handleDeleteCategory: (categoryId: string) => void;
   go: (config: GoConfigWithResource | GoConfig) => string | void;
   token: GlobalToken;
+  monthly_budget_id: string;
 }) {
   return (
     <AntdList
@@ -38,6 +40,9 @@ export default function EditModeList({
                   resource: "Categories",
                   action: "edit",
                   id: group.category.id,
+                },
+                query: {
+                  monthly_budget_id: monthly_budget_id,
                 },
               })
             }
