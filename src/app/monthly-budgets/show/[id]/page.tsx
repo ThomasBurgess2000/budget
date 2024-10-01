@@ -326,6 +326,7 @@ export default function MonthlyBudgetShow() {
           go={go}
           token={token}
           handleDeleteCategory={handleDeleteCategory}
+          monthly_budget_id={record!.id!.toString()}
         />
       ) : (
         <CategoryList

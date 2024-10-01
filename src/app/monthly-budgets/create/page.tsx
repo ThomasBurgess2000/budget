@@ -51,6 +51,7 @@ export default function MonthlyBudgetsCreate() {
                 title: category.title,
                 amount_budgeted: category.amount_budgeted,
                 monthly_budget: newBudgetId,
+                type: category.type,
               },
             });
           }
