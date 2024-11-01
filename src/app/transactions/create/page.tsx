@@ -2,11 +2,20 @@
 
 import { Create, useForm, useSelect } from "@refinedev/antd";
 import { useNavigation, useList, useOne } from "@refinedev/core";
-import { Form, Input, Select, Row, Col, InputNumber, Checkbox } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  Row,
+  Col,
+  InputNumber,
+  Checkbox,
+  Spin,
+} from "antd";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDebounce } from "use-debounce";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import CustomDatePicker from "./DatePicker";
 
 const { Option } = Select;
@@ -42,8 +51,8 @@ export default function TransactionsCreate() {
       } else {
         // Clear the form
         form.resetFields();
-        // Reset the date to the current date
-        form.setFieldsValue({ created_at: dayjs() });
+        // Reset the date to the current date or first day of budget month
+        form.setFieldsValue({ created_at: dayjs(currentDate) });
       }
     },
     successNotification: () => {
@@ -66,7 +75,7 @@ export default function TransactionsCreate() {
       if (values.created_at) {
         values.created_at = values.created_at.format("YYYY-MM-DD");
       }
-      
+
       setTitleInput("");
       setUserSelectedCategory(false);
       setSelectBeforeValue("add");
@@ -134,6 +143,20 @@ export default function TransactionsCreate() {
     },
   });
 
+  // Fetch the budget data
+  const { data: budgetData, isLoading: isBudgetLoading } = useOne({
+    resource: "MonthlyBudgets",
+    id: monthly_budget_id || "",
+    queryOptions: {
+      enabled: !!monthly_budget_id,
+    },
+  });
+
+  // Extract the budget month
+  const budgetMonth: Dayjs | undefined = budgetData?.data?.month
+    ? dayjs(budgetData.data.month)
+    : undefined;
+
   useEffect(() => {
     if (selectedCategoryTitle && transactionsData) {
       const titles = transactionsData.data.map(
@@ -163,7 +186,14 @@ export default function TransactionsCreate() {
         setSelectedCategoryTitle(categoryTitle);
       }
     }
-  }, [debouncedTitleInput, similarTransactionsData, form, categoryData, userSelectedCategory, titleInput]);
+  }, [
+    debouncedTitleInput,
+    similarTransactionsData,
+    form,
+    categoryData,
+    userSelectedCategory,
+    titleInput,
+  ]);
 
   useEffect(() => {
     if (titleInput === "Rollover") {
@@ -195,6 +225,10 @@ export default function TransactionsCreate() {
 
   const currentDate = dayjs();
 
+  if (isBudgetLoading) {
+    return <Spin />;
+  }
+
   return (
     <Create
       saveButtonProps={{
@@ -221,6 +255,8 @@ export default function TransactionsCreate() {
           ...formProps.initialValues,
           created_at: formProps.initialValues?.created_at
             ? dayjs(formProps.initialValues.created_at)
+            : budgetMonth && !budgetMonth.isSame(currentDate, "month")
+            ? budgetMonth.startOf("month")
             : currentDate,
         }}
       >
@@ -290,7 +326,7 @@ export default function TransactionsCreate() {
               name="created_at"
               rules={[{ required: true }]}
             >
-              <CustomDatePicker />
+              <CustomDatePicker month={budgetMonth} />
             </Form.Item>
           </Col>
         </Row>
