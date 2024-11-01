@@ -70,22 +70,71 @@ const MyDatePanel = (props: GetProps<DateComponent>) => {
 interface CustomDatePickerProps {
   value?: Dayjs;
   onChange?: (date: Dayjs | null) => void;
+  month?: Dayjs;
 }
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   value,
   onChange,
+  month,
 }) => {
+  const initialDate = () => {
+    if (month) {
+      const currentDate = dayjs();
+      if (
+        currentDate.month() === month.month() &&
+        currentDate.year() === month.year()
+      ) {
+        return value || currentDate;
+      } else {
+        return month.startOf("month");
+      }
+    }
+    return value || dayjs();
+  };
+
+  const [selectedDate, setSelectedDate] = useState<Dayjs | undefined>(
+    initialDate()
+  );
+
+  useEffect(() => {
+    if (month) {
+      const currentDate = dayjs();
+      if (
+        !(
+          selectedDate &&
+          selectedDate.month() === month.month() &&
+          selectedDate.year() === month.year()
+        )
+      ) {
+        setSelectedDate(month.startOf("month"));
+        if (onChange) {
+          onChange(month.startOf("month"));
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [month]);
+
   const handleDateChange: DatePickerProps["onChange"] = (date) => {
-    if (date && onChange) {
-      const dateOnly = date.startOf("day");
-      onChange(dateOnly);
+    if (date) {
+      setSelectedDate(date);
+      if (onChange) {
+        const dateOnly = date.startOf("day");
+        onChange(dateOnly);
+      }
+    } else {
+      // If clearing is not allowed, you might handle it differently
+      setSelectedDate(undefined);
+      if (onChange) {
+        onChange(null);
+      }
     }
   };
 
   return (
     <DatePicker
-      value={value}
+      value={selectedDate}
       onChange={handleDateChange}
       showNow={false}
       format="M/D/YYYY"
