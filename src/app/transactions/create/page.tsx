@@ -357,15 +357,15 @@ export default function TransactionsCreate() {
                   addonBefore={
                     <Select
                       value={selectBeforeValue}
-                      style={{ width: 60 }}
+                      style={{ width: 100 }}
                       onChange={(value) => {
                         setSelectBeforeValue(value);
                         const currentAmount = form.getFieldValue("amount");
                         handleAmountChange(value, currentAmount);
                       }}
                     >
-                      <Option value="add">-</Option>
-                      <Option value="minus">+</Option>
+                      <Option value="add">Expense</Option>
+                      <Option value="minus">Income</Option>
                     </Select>
                   }
                   changeOnWheel={false}

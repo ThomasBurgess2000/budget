@@ -123,12 +123,13 @@ export default function TransactionsEdit() {
                       handleAmountChange(value, currentAmount);
                     }}
                   >
-                    <Option value="add">+</Option>
-                    <Option value="minus">-</Option>
+                    <Option value="add">Expense</Option>
+                    <Option value="minus">Income</Option>
                   </Select>
                 }
                 changeOnWheel={false}
                 controls={false}
+                value={formProps.form?.getFieldValue("amount")}
               />
             </Form.Item>
           </Col>

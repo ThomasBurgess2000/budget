@@ -51,7 +51,11 @@ export default function TransactionsShow() {
       <Title level={5}>{"Title"}</Title>
       <TextField value={record?.title} />
       <Title level={5}>{"Amount"}</Title>
-      <TextField value={`$${record?.amount}`} />
+      <TextField
+        value={
+          record?.amount < 0 ? `$${Math.abs(record?.amount)}` : `-$${record?.amount}`
+        }
+      />
       <Title level={5}>{"Category"}</Title>
       <TextField
         value={
