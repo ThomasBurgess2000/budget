@@ -44,7 +44,26 @@ export default function CategoryList({
 }) {
   const getHeaderValue = (group: any) => {
     if (group.category.type === "income") {
-      return `$${group.category.amount_budgeted.toFixed(2)}`;
+      <span onClick={() => handleAmountClick(group.category.id)}>
+        {editingCategory === group.category.id ? (
+          <InputNumber
+            defaultValue={group.category.amount_budgeted}
+            onBlur={(e) =>
+              handleAmountChange(group.category.id, parseFloat(e.target.value))
+            }
+            onPressEnter={(e) =>
+              handleAmountChange(
+                group.category.id,
+                parseFloat((e.target as HTMLInputElement).value)
+              )
+            }
+            autoFocus
+            style={{ width: "100px" }}
+          />
+        ) : (
+          `$${group.category.amount_budgeted.toFixed(2)}`
+        )}
+      </span>;
     }
 
     switch (viewMode) {
@@ -114,7 +133,9 @@ export default function CategoryList({
                     transaction: Transaction
                   ) => {
                     // Convert the date to UTC, then format it
-                    const date = dayjs(transaction.created_at).utc().format("Do");
+                    const date = dayjs(transaction.created_at)
+                      .utc()
+                      .format("Do");
                     if (!acc[date]) acc[date] = [];
                     acc[date].push(transaction);
                     return acc;
@@ -154,7 +175,11 @@ export default function CategoryList({
                         }}
                       >
                         <Text>{item.title}</Text>
-                        <Text>{item.amount < 0 ? Math.abs(item.amount).toFixed(2) : (-item.amount).toFixed(2)}</Text>
+                        <Text>
+                          {item.amount < 0
+                            ? Math.abs(item.amount).toFixed(2)
+                            : (-item.amount).toFixed(2)}
+                        </Text>
                       </AntdList.Item>
                     )}
                   />
@@ -172,7 +197,8 @@ export default function CategoryList({
                     }
                     className="md:ml-2 mt-2"
                   >
-                    Rollover ${rolloverAmounts[group.category.title].toFixed(2)}?
+                    Rollover ${rolloverAmounts[group.category.title].toFixed(2)}
+                    ?
                   </Button>
                 )}
               </div>

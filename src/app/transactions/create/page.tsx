@@ -225,8 +225,10 @@ export default function TransactionsCreate() {
   ]);
 
   useEffect(() => {
-    if (titleInput === "Rollover") {
+    if (titleInput === "Rollover" || titleInput === "rollover") {
       setSelectBeforeValue("minus");
+    } else {
+      setSelectBeforeValue("add");
     }
   }, [titleInput, form]);
 
@@ -243,9 +245,6 @@ export default function TransactionsCreate() {
       if (count > maxCount) {
         maxCount = count;
         mostCommonTitle = title;
-        if (title === "Rollover") {
-          setSelectBeforeValue("minus");
-        }
       }
     }
 
@@ -334,8 +333,13 @@ export default function TransactionsCreate() {
             <Input
               onChange={(e) => {
                 setTitleInput(e.target.value);
-                if (e.target.value === "Rollover") {
+                if (
+                  e.target.value === "Rollover" ||
+                  e.target.value === "rollover"
+                ) {
                   setSelectBeforeValue("minus");
+                } else {
+                  setSelectBeforeValue("add");
                 }
               }}
               onFocus={(e) => {
@@ -357,15 +361,15 @@ export default function TransactionsCreate() {
                   addonBefore={
                     <Select
                       value={selectBeforeValue}
-                      style={{ width: 60 }}
+                      style={{ width: 100 }}
                       onChange={(value) => {
                         setSelectBeforeValue(value);
                         const currentAmount = form.getFieldValue("amount");
                         handleAmountChange(value, currentAmount);
                       }}
                     >
-                      <Option value="add">-</Option>
-                      <Option value="minus">+</Option>
+                      <Option value="add">Expense</Option>
+                      <Option value="minus">Income</Option>
                     </Select>
                   }
                   changeOnWheel={false}

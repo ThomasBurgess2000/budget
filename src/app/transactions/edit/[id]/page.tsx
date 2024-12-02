@@ -34,7 +34,10 @@ export default function TransactionsEdit() {
     defaultValue: blogPostsData?.categories?.id,
   });
 
-  const [selectBeforeValue, setSelectBeforeValue] = useState("add");
+  const [selectBeforeValue, setSelectBeforeValue] = useState(() => {
+    const amount = blogPostsData?.amount;
+    return amount < 0 ? "minus" : "add";
+  });
 
   const handleSubmit = async (values: any) => {
     try {
@@ -115,7 +118,7 @@ export default function TransactionsEdit() {
                 addonBefore={
                   <Select
                     value={selectBeforeValue}
-                    style={{ width: 60 }}
+                    style={{ width: 100 }}
                     onChange={(value) => {
                       setSelectBeforeValue(value);
                       const currentAmount =
@@ -123,12 +126,13 @@ export default function TransactionsEdit() {
                       handleAmountChange(value, currentAmount);
                     }}
                   >
-                    <Option value="add">+</Option>
-                    <Option value="minus">-</Option>
+                    <Option value="add">Expense</Option>
+                    <Option value="minus">Income</Option>
                   </Select>
                 }
                 changeOnWheel={false}
                 controls={false}
+                value={formProps.form?.getFieldValue("amount")}
               />
             </Form.Item>
           </Col>
