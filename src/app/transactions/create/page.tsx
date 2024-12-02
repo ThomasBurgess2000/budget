@@ -225,8 +225,10 @@ export default function TransactionsCreate() {
   ]);
 
   useEffect(() => {
-    if (titleInput === "Rollover") {
+    if (titleInput === "Rollover" || titleInput === "rollover") {
       setSelectBeforeValue("minus");
+    } else {
+      setSelectBeforeValue("add");
     }
   }, [titleInput, form]);
 
@@ -243,9 +245,6 @@ export default function TransactionsCreate() {
       if (count > maxCount) {
         maxCount = count;
         mostCommonTitle = title;
-        if (title === "Rollover") {
-          setSelectBeforeValue("minus");
-        }
       }
     }
 
@@ -334,8 +333,13 @@ export default function TransactionsCreate() {
             <Input
               onChange={(e) => {
                 setTitleInput(e.target.value);
-                if (e.target.value === "Rollover") {
+                if (
+                  e.target.value === "Rollover" ||
+                  e.target.value === "rollover"
+                ) {
                   setSelectBeforeValue("minus");
+                } else {
+                  setSelectBeforeValue("add");
                 }
               }}
               onFocus={(e) => {
