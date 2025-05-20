@@ -6,6 +6,7 @@ export const AuthPage = (props: AuthPageProps) => {
   return (
     <AuthPageBase
       {...props}
+      title="Abacus"
       formProps={{
         initialValues: {
           email: "",
