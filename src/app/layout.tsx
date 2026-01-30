@@ -5,6 +5,7 @@ import routerProvider from "@refinedev/nextjs-router";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import React, { Suspense } from "react";
+import NextTopLoader from "nextjs-toploader";
 
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { AppIcon } from "@components/app-icon";
@@ -34,6 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <NextTopLoader showSpinner={false} />
         <Suspense>
           <RefineKbarProvider>
             <AntdRegistry>
