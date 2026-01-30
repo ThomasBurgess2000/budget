@@ -12,6 +12,7 @@ import {
   Checkbox,
   Spin,
   Typography,
+  Tabs,
 } from "antd";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -19,6 +20,7 @@ import { useDebounce } from "use-debounce";
 import dayjs, { Dayjs } from "dayjs";
 import CustomDatePicker from "./DatePicker";
 import { Card } from "antd/lib";
+import SmartLogging from "./SmartLogging";
 
 const { Option } = Select;
 
@@ -49,7 +51,7 @@ export default function TransactionsCreate() {
     }
   };
 
-  const { formProps, saveButtonProps, onFinish } = useForm({
+  const { formProps, saveButtonProps, onFinish, formLoading } = useForm({
     redirect: false,
     onMutationSuccess: () => {
       if (!continueLogging) {
@@ -276,147 +278,174 @@ export default function TransactionsCreate() {
     return <Spin />;
   }
 
-  return (
-    <>
-      <Create
-        saveButtonProps={{
-          ...saveButtonProps,
-          onClick: () => {
-            form.submit();
-          },
-        }}
-        breadcrumb={false}
-        wrapperProps={{
-          style: {
-            marginBottom: "48px",
-          },
-          className: "w-full md:w-1/2 mx-auto",
-        }}
-        headerButtons={({ defaultButtons }) => <>{defaultButtons}</>}
-      >
-        <Form
-          {...formProps}
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          onValuesChange={(_, values) => {
-            setSelectedDate(values.created_at?.format("YYYY-MM-DD"));
-          }}
-          initialValues={{
-            ...formProps.initialValues,
-            created_at: formProps.initialValues?.created_at
-              ? dayjs(formProps.initialValues.created_at)
-              : budgetMonth && !budgetMonth.isSame(currentDate, "month")
-              ? budgetMonth.startOf("month")
-              : currentDate,
-          }}
-        >
-          <Form.Item
-            label={"Category"}
-            name={"category"}
-            rules={[{ required: true }]}
+  const tabItems = [
+    {
+      key: "create",
+      label: "Create Transaction",
+      children: (
+        <>
+          <Create
+            saveButtonProps={{
+              ...saveButtonProps,
+              loading: formLoading,
+              onClick: () => {
+                form.submit();
+              },
+            }}
+            breadcrumb={false}
+            wrapperProps={{
+              style: {
+                marginBottom: "48px",
+              },
+              className: "w-full md:w-1/2 mx-auto",
+            }}
+            headerButtons={({ defaultButtons }) => <>{defaultButtons}</>}
           >
-            <Select
-              {...categorySelectProps}
-              onChange={(value: any, option: any) => {
-                setSelectedCategoryTitle(option?.label ?? null);
-                setUserSelectedCategory(true); // Set flag when user selects a category
-                setSelectedCategory(value);
+            <Form
+              {...formProps}
+              form={form}
+              layout="vertical"
+              onFinish={handleSubmit}
+              onValuesChange={(_, values) => {
+                setSelectedDate(values.created_at?.format("YYYY-MM-DD"));
               }}
-            />
-          </Form.Item>
-          <Form.Item
-            label={"Title"}
-            name={["title"]}
-            rules={[{ required: true }]}
-          >
-            <Input
-              onChange={(e) => {
-                setTitleInput(e.target.value);
-                if (
-                  e.target.value === "Rollover" ||
-                  e.target.value === "rollover"
-                ) {
-                  setSelectBeforeValue("minus");
-                } else {
-                  setSelectBeforeValue("add");
-                }
+              initialValues={{
+                ...formProps.initialValues,
+                created_at: formProps.initialValues?.created_at
+                  ? dayjs(formProps.initialValues.created_at)
+                  : budgetMonth && !budgetMonth.isSame(currentDate, "month")
+                  ? budgetMonth.startOf("month")
+                  : currentDate,
               }}
-              onFocus={(e) => {
-                // Only clear the title if it was auto-populated and not manually entered
-                if (e.target.value && !titleInput) {
-                  form.setFieldsValue({ title: "" });
-                }
-              }}
-            />
-          </Form.Item>
-          <Row gutter={16}>
-            <Col span={12}>
+            >
               <Form.Item
-                label={"Amount"}
-                name="amount"
+                label={"Category"}
+                name={"category"}
                 rules={[{ required: true }]}
               >
-                <InputNumber
-                  addonBefore={
-                    <Select
-                      value={selectBeforeValue}
-                      style={{ width: 100 }}
-                      onChange={(value) => {
-                        setSelectBeforeValue(value);
-                        const currentAmount = form.getFieldValue("amount");
-                        handleAmountChange(value, currentAmount);
-                      }}
-                    >
-                      <Option value="add">Expense</Option>
-                      <Option value="minus">Income</Option>
-                    </Select>
-                  }
-                  changeOnWheel={false}
-                  controls={false}
+                <Select
+                  {...categorySelectProps}
+                  onChange={(value: any, option: any) => {
+                    setSelectedCategoryTitle(option?.label ?? null);
+                    setUserSelectedCategory(true); // Set flag when user selects a category
+                    setSelectedCategory(value);
+                  }}
                 />
               </Form.Item>
-            </Col>
-            <Col span={12}>
               <Form.Item
-                label={"Date"}
-                name="created_at"
+                label={"Title"}
+                name={["title"]}
                 rules={[{ required: true }]}
               >
-                <CustomDatePicker month={budgetMonth} />
+                <Input
+                  onChange={(e) => {
+                    setTitleInput(e.target.value);
+                    if (
+                      e.target.value === "Rollover" ||
+                      e.target.value === "rollover"
+                    ) {
+                      setSelectBeforeValue("minus");
+                    } else {
+                      setSelectBeforeValue("add");
+                    }
+                  }}
+                  onFocus={(e) => {
+                    // Only clear the title if it was auto-populated and not manually entered
+                    if (e.target.value && !titleInput) {
+                      form.setFieldsValue({ title: "" });
+                    }
+                  }}
+                />
               </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-        <Checkbox
-          checked={continueLogging}
-          onChange={(e) => setContinueLogging(e.target.checked)}
-        >
-          Continue Logging
-        </Checkbox>
-      </Create>
-      {alreadyRecordedTransactionsData?.data &&
-        alreadyRecordedTransactionsData?.data.length > 0 &&
-        selectedDate &&
-        selectedCategory && (
-          <div className="flex justify-center">
-            <Card className="w-full md:w-1/2">
-              <Typography.Text>
-                Already recorded transactions for this date and category:
-                <br />
-                <br />
-                {alreadyRecordedTransactionsData?.data.map((transaction) => (
-                  <>
-                    <Typography.Text key={transaction.id}>
-                      {transaction.title} - ${transaction.amount}
-                    </Typography.Text>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label={"Amount"}
+                    name="amount"
+                    rules={[{ required: true }]}
+                  >
+                    <InputNumber
+                      addonBefore={
+                        <Select
+                          value={selectBeforeValue}
+                          style={{ width: 100 }}
+                          onChange={(value) => {
+                            setSelectBeforeValue(value);
+                            const currentAmount = form.getFieldValue("amount");
+                            handleAmountChange(value, currentAmount);
+                          }}
+                        >
+                          <Option value="add">Expense</Option>
+                          <Option value="minus">Income</Option>
+                        </Select>
+                      }
+                      changeOnWheel={false}
+                      controls={false}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label={"Date"}
+                    name="created_at"
+                    rules={[{ required: true }]}
+                  >
+                    <CustomDatePicker month={budgetMonth} />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+            <Checkbox
+              checked={continueLogging}
+              onChange={(e) => setContinueLogging(e.target.checked)}
+            >
+              Continue Logging
+            </Checkbox>
+          </Create>
+          {alreadyRecordedTransactionsData?.data &&
+            alreadyRecordedTransactionsData?.data.length > 0 &&
+            selectedDate &&
+            selectedCategory && (
+              <div className="flex justify-center">
+                <Card className="w-full md:w-1/2">
+                  <Typography.Text>
+                    Already recorded transactions for this date and category:
                     <br />
-                  </>
-                ))}
-              </Typography.Text>
-            </Card>
-          </div>
-        )}
-    </>
+                    <br />
+                    {alreadyRecordedTransactionsData?.data.map((transaction) => (
+                      <>
+                        <Typography.Text key={transaction.id}>
+                          {transaction.title} - ${transaction.amount}
+                        </Typography.Text>
+                        <br />
+                      </>
+                    ))}
+                  </Typography.Text>
+                </Card>
+              </div>
+            )}
+        </>
+      ),
+    },
+    {
+      key: "smart-logging",
+      label: "Smart Logging",
+      children: monthly_budget_id ? (
+        <SmartLogging monthlyBudgetId={monthly_budget_id} />
+      ) : (
+        <Typography.Text type="danger">
+          Monthly budget ID is required for Smart Logging
+        </Typography.Text>
+      ),
+    },
+  ];
+
+  return (
+    <Tabs
+      defaultActiveKey="create"
+      items={tabItems}
+      centered
+      style={{ marginTop: 16 }}
+    />
   );
 }

@@ -2,7 +2,7 @@
 
 import { List, useTable } from "@refinedev/antd";
 import { useGo, useDelete } from "@refinedev/core";
-import { Table, Button, Popconfirm, Space } from "antd";
+import { Table, Button, Popconfirm, Space, Spin } from "antd";
 import dayjs from "dayjs";
 import { LogPurchaseButton } from "@components/LogPurchaseButton";
 import { useState, useRef, useCallback, useEffect } from "react";
@@ -19,6 +19,7 @@ export default function MonthlyBudgetsList() {
 
   const go = useGo();
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
+  const [navigating, setNavigating] = useState(false);
   const { mutate: deleteMutate } = useDelete();
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -85,7 +86,8 @@ export default function MonthlyBudgetsList() {
 
   const handleRowClick = useCallback(
     (record: any) => {
-      if (!selectedBudget) {
+      if (!selectedBudget && !navigating) {
+        setNavigating(true);
         go({
           to: {
             resource: "MonthlyBudgets",
@@ -95,7 +97,7 @@ export default function MonthlyBudgetsList() {
         });
       }
     },
-    [go, selectedBudget]
+    [go, selectedBudget, navigating]
   );
 
   const onRow = useCallback(
@@ -124,6 +126,7 @@ export default function MonthlyBudgetsList() {
         className: "w-full md:w-1/2 mx-auto",
       }}
     >
+      <Spin spinning={navigating} tip="Loading...">
       <Table {...tableProps} rowKey="id" showHeader={false} onRow={onRow}>
         <Table.Column
           dataIndex="month"
@@ -152,6 +155,7 @@ export default function MonthlyBudgetsList() {
           sorter
         />
       </Table>
+      </Spin>
       {mostRecentBudget?.id && (
         <LogPurchaseButton monthly_budget_id={mostRecentBudget.id.toString()} />
       )}
