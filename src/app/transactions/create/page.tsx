@@ -96,16 +96,17 @@ export default function TransactionsCreate() {
     }
   };
 
-  const { selectProps: categorySelectProps } = useSelect({
-    resource: "Categories",
-    filters: [
-      {
-        field: "monthly_budget",
-        operator: "eq",
-        value: monthly_budget_id,
-      },
-    ],
-  });
+  const { selectProps: categorySelectProps, queryResult: categoryQueryResult } =
+    useSelect({
+      resource: "Categories",
+      filters: [
+        {
+          field: "monthly_budget",
+          operator: "eq",
+          value: monthly_budget_id,
+        },
+      ],
+    });
 
   const { data: categoriesData } = useList({
     resource: "Categories",
@@ -204,13 +205,20 @@ export default function TransactionsCreate() {
       titleInput !== "" &&
       debouncedTitleInput &&
       similarTransactionsData &&
-      !userSelectedCategory // Check if user hasn't selected a category
+      !userSelectedCategory && // Check if user hasn't selected a category
+      categoryQueryResult?.data?.data // Ensure category options are loaded
     ) {
       const similarTransaction = similarTransactionsData.data[0];
       if (similarTransaction && similarTransaction.category && categoryData) {
         const categoryId = currentMonthCategoryData?.data[0]?.id;
         const categoryTitle = currentMonthCategoryData?.data[0]?.title;
         if (!categoryTitle) return; // If the category title is null, return
+
+        // Verify the category exists in the loaded options before setting
+        const categoryExists = categoryQueryResult.data.data.some(
+          (cat: any) => cat.id === categoryId
+        );
+        if (!categoryExists) return;
 
         form.setFieldsValue({ category: categoryId }); // Set the category ID
         setSelectedCategoryTitle(categoryTitle);
@@ -224,6 +232,7 @@ export default function TransactionsCreate() {
     userSelectedCategory,
     titleInput,
     currentMonthCategoryData,
+    categoryQueryResult?.data?.data,
   ]);
 
   useEffect(() => {
