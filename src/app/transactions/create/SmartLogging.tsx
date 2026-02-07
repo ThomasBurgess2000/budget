@@ -110,12 +110,26 @@ export default function SmartLogging({ monthlyBudgetId }: SmartLoggingProps) {
     };
   }, [handlePaste]);
 
-  const convertToBase64 = (file: File): Promise<string> => {
+  const compressImage = (file: File, maxDim = 1600, quality = 0.7): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const scale = maxDim / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { reject(new Error("Canvas not supported")); return; }
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => reject(new Error("Failed to load image"));
+      img.src = URL.createObjectURL(file);
     });
   };
 
@@ -132,7 +146,7 @@ export default function SmartLogging({ monthlyBudgetId }: SmartLoggingProps) {
       const base64Images = await Promise.all(
         fileList.map(async (file) => {
           if (file.originFileObj) {
-            return convertToBase64(file.originFileObj);
+            return compressImage(file.originFileObj);
           }
           return "";
         })
@@ -184,6 +198,12 @@ export default function SmartLogging({ monthlyBudgetId }: SmartLoggingProps) {
 
   const handleReject = (id: string) => {
     updateSuggestion(id, { status: "rejected" });
+  };
+
+  const handleApproveAll = () => {
+    setSuggestions((prev) =>
+      prev.map((s) => (s.status === "pending" ? { ...s, status: "approved" } : s))
+    );
   };
 
   const handleSubmit = async () => {
@@ -283,6 +303,18 @@ export default function SmartLogging({ monthlyBudgetId }: SmartLoggingProps) {
                 {pendingCount > 0 && <Tag color="blue">{pendingCount} pending</Tag>}
                 {approvedCount > 0 && <Tag color="green">{approvedCount} approved</Tag>}
               </Space>
+            }
+            extra={
+              pendingCount > 0 && (
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<CheckOutlined />}
+                  onClick={handleApproveAll}
+                >
+                  Approve All
+                </Button>
+              )
             }
             style={{ marginBottom: 16 }}
           >
