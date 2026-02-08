@@ -16,7 +16,7 @@ const { Option } = Select;
 export default function TransactionsEdit() {
   const { formProps, saveButtonProps, query, onFinish } = useForm({
     meta: {
-      select: "*, Categories(id,title)",
+      select: "*, Categories(id,title,monthly_budget)",
     },
     successNotification: () => {
       return {
@@ -28,10 +28,21 @@ export default function TransactionsEdit() {
   });
 
   const blogPostsData = query?.data?.data;
+  const monthlyBudgetId = blogPostsData?.Categories?.monthly_budget;
 
   const { selectProps: categorySelectProps } = useSelect({
     resource: "Categories",
-    defaultValue: blogPostsData?.categories?.id,
+    defaultValue: blogPostsData?.Categories?.id,
+    filters: [
+      {
+        field: "monthly_budget",
+        operator: "eq",
+        value: monthlyBudgetId,
+      },
+    ],
+    queryOptions: {
+      enabled: !!monthlyBudgetId,
+    },
   });
 
   const [selectBeforeValue, setSelectBeforeValue] = useState(() => {
