@@ -187,6 +187,19 @@ export default function TransactionsCreate() {
     ? dayjs(budgetData.data.month)
     : undefined;
 
+  // Sync the form's created_at when budget data loads, in case
+  // initialValues was applied before budgetMonth was available
+  const budgetMonthStr = budgetData?.data?.month;
+  useEffect(() => {
+    if (budgetMonthStr) {
+      const bm = dayjs(budgetMonthStr);
+      const now = dayjs();
+      if (!bm.isSame(now, "month")) {
+        form.setFieldsValue({ created_at: bm.startOf("month") });
+      }
+    }
+  }, [budgetMonthStr, form]);
+
   useEffect(() => {
     if (selectedCategoryTitle && transactionsData) {
       const titles = transactionsData.data.map(
