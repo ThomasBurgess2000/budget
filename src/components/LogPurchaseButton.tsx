@@ -2,9 +2,17 @@ import React, { useState } from "react";
 import { useGo } from "@refinedev/core";
 import { Button } from "antd";
 
-export const LogPurchaseButton: React.FC<{ monthly_budget_id: string }> = ({
-  monthly_budget_id,
-}) => {
+type LogPurchaseButtonProps =
+  | {
+      monthly_budget_id: string;
+      href?: never;
+    }
+  | {
+      monthly_budget_id?: never;
+      href: string;
+    };
+
+export const LogPurchaseButton: React.FC<LogPurchaseButtonProps> = (props) => {
   const go = useGo();
   const [loading, setLoading] = useState(false);
 
@@ -19,12 +27,17 @@ export const LogPurchaseButton: React.FC<{ monthly_budget_id: string }> = ({
       }}
       onClick={() => {
         setLoading(true);
+        if ("href" in props) {
+          go({ to: props.href, type: "replace" });
+          return;
+        }
+
         go({
           to: {
             resource: "Transactions",
             action: "create",
           },
-          query: { monthly_budget_id },
+          query: { monthly_budget_id: props.monthly_budget_id },
         });
       }}
     >
