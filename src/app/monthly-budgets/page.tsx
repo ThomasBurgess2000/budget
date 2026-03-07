@@ -15,8 +15,6 @@ export default function MonthlyBudgetsList() {
     },
   });
 
-  const mostRecentBudget = tableProps?.dataSource?.[0];
-
   const go = useGo();
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
   const [navigating, setNavigating] = useState(false);
@@ -156,9 +154,7 @@ export default function MonthlyBudgetsList() {
         />
       </Table>
       </Spin>
-      {mostRecentBudget?.id && (
-        <LogPurchaseButton monthly_budget_id={mostRecentBudget.id.toString()} />
-      )}
+      <LogPurchaseButton href="/current-budget" />
     </List>
   );
 }
