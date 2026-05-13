@@ -30,4 +30,5 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
-            bash -lc '~/deploy-budget.sh'
+            export PATH="$HOME/.yarn/bin:$PATH"
+            bash -c '~/deploy-budget.sh'
