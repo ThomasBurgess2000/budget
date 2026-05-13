@@ -9,14 +9,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate SSH secrets
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          test -n "$SSH_HOST" || { echo "SSH_HOST secret is missing"; exit 1; }
+          test -n "$SSH_USER" || { echo "SSH_USER secret is missing"; exit 1; }
+          test -n "$SSH_KEY" || { echo "SSH_KEY secret is missing"; exit 1; }
+          test -n "$SSH_PORT" || { echo "SSH_PORT secret is missing"; exit 1; }
+
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          debug: true
           script_stop: true
           script: |
             bash -lc '~/deploy-budget.sh'
